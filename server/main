@@ -1,0 +1,23 @@
+package server;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+
+
+public class ProgServer 
+{
+    public static void main(String args[]) throws IOException
+    {
+        
+        String porta = "";      
+        System.out.println("Inserire Porta Server");
+        
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        porta = br.readLine(); 
+        
+        Server server = new Server(Integer.valueOf(porta));
+        
+        server.start();
+    }
+}

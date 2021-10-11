@@ -1,0 +1,71 @@
+import java.io.*;
+import java.net.*;
+
+public class ServerThread extends Thread 
+
+{
+    ServerSocket server;// porta
+    Socket client;//Scoket per il collegamento
+    String stringaRicevuta; // stringa in
+    String stringaModificata;// stringa out
+    BufferedReader inDalClient;// in stream dal client
+    DataOutputStream outVersoClient;// out stream verso il client
+
+    public ServerThread(Socket socket, ServerSocket serverSocket) 
+    {
+        this.client = socket;
+        this.server = serverSocket;
+    }
+
+    public void run() 
+    {
+        try 
+        {
+            comunica();
+
+        } 
+        catch (Exception e) 
+
+        {
+            e.printStackTrace(System.out);
+        }
+    }
+
+    public void comunica() throws Exception // comunicazione con il client
+    {                   
+
+        inDalClient = new BufferedReader(new InputStreamReader(client.getInputStream())); // lettura dello stream dal Client
+                                                                                         
+        outVersoClient = new DataOutputStream(client.getOutputStream()); // invio dello stream verso il client
+        for (;;) 
+        {
+            stringaRicevuta = inDalClient.readLine(); // lettura stringa proveniente dal client
+            if (stringaRicevuta.equals("STOP")) 
+            {
+                outVersoClient.writeBytes(stringaRicevuta + " (=> chiusura del server)" + '\n'); // invio della stringa di risposta
+                server.close();
+                break;
+            }
+            if (stringaRicevuta == null || stringaRicevuta.equals("FINE")) {
+                outVersoClient.writeBytes(stringaRicevuta + " (=> server in chiusura... )" + '\n'); // invio della stringa di risposta
+                
+                System.out.println("Echo sul sever in chiusura :" + stringaRicevuta);
+                client.close();
+
+                break;
+            } 
+            else 
+            {
+                
+                    outVersoClient.writeBytes(stringaRicevuta + " (ricevuta e ritrasmessa)" + '\n');
+                    System.out.println("6 Echo sul server :" + stringaRicevuta);
+                
+            }
+        }
+
+        outVersoClient.close();
+        inDalClient.close();
+        System.out.println("9 Chiusura socket" + client);
+        client.close();
+    }
+}
